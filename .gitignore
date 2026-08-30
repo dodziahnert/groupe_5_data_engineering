@@ -1,2 +1,10 @@
-/.metals
-/.vscode
+# fichiers temporaires de compilation
+target/
+project/target/
+project/project/
+
+# dossiers des editeurs
+.idea/
+.metals/
+.vscode/
+.bsp/

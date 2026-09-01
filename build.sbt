@@ -41,3 +41,13 @@ Compile / run := Defaults.runTask(
 ).evaluated
 
 run / fork := true
+
+// options java pour faire tourner spark sur java recent
+run / javaOptions ++= Seq(
+  "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
+  "--add-opens=java.base/java.nio=ALL-UNNAMED",
+  "--add-opens=java.base/java.lang=ALL-UNNAMED",
+  "--add-opens=java.base/java.util=ALL-UNNAMED",
+  "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
+  "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
+)

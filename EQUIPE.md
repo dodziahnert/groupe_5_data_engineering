@@ -2,28 +2,31 @@
 
 Projet Data Engineering : pipeline de traitement de donnees e-commerce en Scala et Apache Spark.
 
-## Membres et repartition des roles
+## Membres
 
-| Membre | Nom | Role | Parties | Fichiers principaux |
-|--------|-----|------|---------|---------------------|
-| A | Mamoudou BAH | Data Ingestion & Platform Engineer | 1, 2, 7 | build.sbt, application.conf, case classes, DataIngestion, DataValidation, DataQualityReport, README |
-| B | AHNERT Dodzi | Transformation & Enrichissement | 3, 4 | DataTransformation, TimeFeatures |
-| C | BOUKOYI MOUTSASSI Rhupthur Jevainaitre | Analyse & Optimisation | 5, 6 | Analytics, SparkOptimizations, MainApp |
+| Membre | Nom et prenom | E-mail | Nom configure dans Git |
+|--------|---------------|--------|------------------------|
+| A | Mamoudou BAH | bahmahmoud556@gmail.com | Mamoudou BAH |
+| B | AHNERT Dodzi | dodzi.ahnert@hotmail.fr | Dodzi AHNERT |
+| C | BOUKOYI MOUTSASSI Rhupthur Jevainaitre | rjmboukoyi@gmail.com | Rhupthur Boukoyi |
 
-## Detail des responsabilites
+## Roles et questions traitees
 
 ### Membre A - Mamoudou BAH
-Mise en place des fondations du projet : structure des dossiers, configuration de compilation (build.sbt, sbt-assembly), externalisation des parametres dans application.conf. Definition des case classes decrivant les quatre sources de donnees. Lecture typee des fichiers (ingestion), validation des donnees selon des regles metier avec separation des lignes valides et rejetees, et production du rapport de qualite des donnees. Redaction du README.
+Role : Data Ingestion & Platform Engineer.
+Questions traitees : Partie 1 (structure du projet, build.sbt), Partie 2 (ingestion multi-format, validation des donnees, gestion d'erreurs, rapport de qualite), Partie 7 (configuration externalisee). Redaction du README.
 
 ### Membre B - AHNERT Dodzi
-Transformation et enrichissement des donnees : jointures entre les transactions et les tables de reference (utilisateurs, produits, marchands), extraction de caracteristiques temporelles a partir du timestamp brut, calcul de rangs et compteurs par utilisateur, fenetres glissantes et indicateurs de suspicion. Optimisation de la fonction de transformation.
+Role : Transformation & Enrichissement.
+Questions traitees : Partie 3 (UDF d'extraction de caracteristiques temporelles, enrichissement des donnees, analyses par fenetre glissante, detection de transactions suspectes).
 
 ### Membre C - BOUKOYI MOUTSASSI Rhupthur Jevainaitre
-Analyses metier : indicateurs sur les marchands (chiffre d'affaires, commissions, clients uniques, rangs par categorie et par region), cohortes de retention et detection de fraude. Optimisations Spark (broadcast join, cache et persist conditionnels, nombre de partitions de shuffle configurable). Orchestration complete du pipeline dans MainApp.
+Role : Analyse & Optimisation.
+Questions traitees : Partie 4 (KPI marchands, cohortes de retention), Partie 5 (optimisations Spark : cache, persist, broadcast, partitions de shuffle), Partie 6 (application principale et orchestration, execution modulaire par etape).
 
 ## Organisation du travail
 
-Le travail a ete organise avec Git : une branche par tache, un commit par etape avec un message explicite, et une pull request par fonctionnalite avant fusion dans la branche principale. Chaque partie a ete relue par un autre membre avant integration.
+Le travail a ete organise avec Git : une branche par tache, des commits reguliers avec des messages explicites, et une pull request par fonctionnalite avant fusion dans la branche principale. Chaque membre a configure son nom et son e-mail dans Git afin que ses commits soient identifiables dans l'historique. Chaque partie a ete relue par un autre membre avant integration (voir CONTRIBUTIONS.md).
 
 ## Environnement technique
 

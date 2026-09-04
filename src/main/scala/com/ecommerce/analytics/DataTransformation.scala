@@ -16,7 +16,7 @@ object DataTransformation {
         val joined = transactions.alias("t")
             .join(users.alias("u"), Seq("user_id"), "inner")
             .join(products.alias("p"), Seq("product_id"), "left")
-            .join(broadcast(merchants).alias("m"), Seq("merchant_id"), "left")
+            .join(merchants.alias("m"), Seq("merchant_id"), "left")
             .select(
                 col("t.*"),
                 col("u.age"), col("u.annual_income"), col("u.city").alias("user_city"),

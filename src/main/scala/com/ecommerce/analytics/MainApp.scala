@@ -14,6 +14,8 @@ object MainApp {
     // lecture
     val transactions = DataIngestion.readTransactions(spark).toDF()
     val users = DataIngestion.readUsers(spark).toDF()
+    val merchants = DataIngestion.readMerchants(spark).toDF()
+    val products = DataIngestion.readProducts(spark).toDF()
 
     // validation
     val txResult = DataValidation.validateTransactions(transactions)
@@ -39,6 +41,9 @@ object MainApp {
     DataQualityReport.writeSingleCsv(summary, AppConfig.outputPath + "/quality_summary")
     DataQualityReport.writeSingleCsv(detail, AppConfig.outputPath + "/quality_detail")
     println(">>> Rapports sauvegardes dans le dossier " + AppConfig.outputPath)
+
+    val enriched = DataTransformation.transform(transactions, users, products, merchants)
+    DataTransformation.reportSuspicious(enriched)
 
     spark.stop()
   }

@@ -54,13 +54,35 @@ sbt compile
 
 ## Execution
 
-Pour lancer le programme :
+Pour lancer tout le pipeline :
 
 ```
 sbt run
 ```
 
-Le programme execute tout le pipeline : lecture des donnees, validation et rapport de qualite, transformation et enrichissement, puis analyses metier. Tous les resultats sont sauvegardes au format CSV dans le dossier `output/`.
+Le programme execute alors toutes les etapes : lecture des donnees, validation et rapport de qualite, transformation et enrichissement, puis analyses metier. Tous les resultats sont sauvegardes au format CSV dans le dossier `output/`.
+
+### Lancer une seule etape
+
+Le programme accepte un argument qui precise l'etape a executer. Cela permet de tester un module sans relancer tout le pipeline :
+
+```
+sbt "run ingestion"        # lecture, validation et rapport de qualite
+sbt "run transformation"   # ingestion puis enrichissement des donnees
+sbt "run analytics"        # ingestion, transformation puis analyses metier
+sbt "run all"              # tout le pipeline (valeur par defaut)
+```
+
+Les etapes dependent les unes des autres : demander `transformation` rejoue d'abord l'ingestion, et `analytics` rejoue l'ingestion et la transformation. Chaque etape affiche son heure de debut, son heure de fin et sa duree. Un argument inconnu affiche un message d'aide listant les valeurs acceptees, sans interrompre brutalement le programme.
+
+Avec le jar genere par `sbt assembly`, les memes etapes se lancent ainsi :
+
+```
+spark-submit --class com.ecommerce.analytics.MainApp app.jar ingestion
+spark-submit --class com.ecommerce.analytics.MainApp app.jar transformation
+spark-submit --class com.ecommerce.analytics.MainApp app.jar analytics
+spark-submit --class com.ecommerce.analytics.MainApp app.jar all
+```
 
 ## Regles de validation
 

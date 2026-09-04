@@ -36,6 +36,9 @@ Plusieurs optimisations conditionnelles ont ete mises en place et pilotees par l
 ### Orchestration
 Le point d'entree MainApp enchaine les trois etapes du pipeline (ingestion et validation, transformation, analyse) et gere les cas particuliers rencontres a l'assemblage, notamment les valeurs nulles et les timestamps corrompus.
 
+### Lancement par etape
+MainApp accepte un argument en ligne de commande (ingestion, transformation, analytics, ou all par defaut) qui permet de lancer une seule etape du pipeline sans executer le reste, afin de tester chaque module independamment. Les dependances entre etapes sont respectees : chaque etape rejoue ce dont elle a besoin en amont. Chaque etape journalise son heure de debut, son heure de fin et sa duree. Un argument inconnu affiche un message d'aide listant les valeurs acceptees, sans lever d'exception non geree.
+
 ## Relecture croisee
 
 Chaque partie a ete relue par un autre membre avant fusion dans la branche principale, via les pull requests du depot.

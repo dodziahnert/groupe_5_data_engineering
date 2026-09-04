@@ -2,7 +2,7 @@
 
 Pipeline de traitement de donnees e-commerce developpe en Scala avec Apache Spark.
 
-Le projet lit des donnees de ventes en ligne (transactions, utilisateurs, marchands, produits), controle leur qualite, puis prepare des analyses. Ce document decrit la partie actuellement disponible : l'ingestion, la validation et le rapport de qualite des donnees.
+Le projet lit des donnees de ventes en ligne (transactions, utilisateurs, marchands, produits), controle leur qualite, les enrichit, puis produit des analyses metier. Le pipeline complet est fonctionnel de bout en bout : ingestion et validation, transformation et enrichissement, analyse et optimisation.
 
 ## Prerequis
 
@@ -32,7 +32,7 @@ groupe_5_data_engineering/
     └── scala/com/ecommerce/
         ├── models/                   case classes (Transaction, User, Product, Merchant)
         ├── utils/                    session spark et lecture de la configuration
-        └── analytics/                ingestion, validation, rapport qualite
+        └── analytics/                ingestion, validation, qualite, transformation, analyse
 ```
 
 ## Donnees sources
@@ -60,7 +60,7 @@ Pour lancer le programme :
 sbt run
 ```
 
-Le programme lit les donnees, applique les regles de validation, affiche un recapitulatif de qualite et sauvegarde deux rapports au format CSV dans le dossier `output/`.
+Le programme execute tout le pipeline : lecture des donnees, validation et rapport de qualite, transformation et enrichissement, puis analyses metier. Tous les resultats sont sauvegardes au format CSV dans le dossier `output/`.
 
 ## Regles de validation
 
@@ -94,12 +94,6 @@ sbt assembly
 ```
 
 Le jar est genere dans `target/scala-2.12/ecommerce-analytics.jar` et peut etre lance avec spark-submit.
-
-## Parties a venir
-
-- Transformation et enrichissement des donnees
-- Analyses metier
-- Optimisations Spark
 
 ## Module de Transformation et d'Enrichissement des Données
 
@@ -167,3 +161,40 @@ DataTransformation.reportSuspicious(enriched)
 ### 💡 Notes Techniques
 - **Robustesse** : Le typage du fenêtrage glissant sur 7 jours est explicitement casté en `Long` pour garantir la compatibilité stricte avec `rangeBetween`. L'UDF de dates est dotée de *try/catch* pour ne pas interrompre le pipeline en cas d'horodatages corrompus.
 - **Optimisation** : Les jointures utilisent des alias explicites pour éviter les conflits de noms de colonnes et les ambiguïtés.
+---
+
+## Module d'Analyse et d'Optimisation
+
+Ce module produit les analyses metier a partir des donnees enrichies, et met en place les optimisations Spark du pipeline.
+
+### Analyses metier
+
+Le fichier `Analytics.scala` produit plusieurs analyses :
+
+- **KPI marchands** : pour chaque marchand, chiffre d'affaires total, commission totale, nombre de transactions, nombre de clients uniques, panier moyen et nombre de transactions suspectes. Un classement (rang) est calcule par categorie et par region.
+- **Repartition par tranche d'age** : chiffre d'affaires et nombre de transactions par marchand et par tranche d'age des clients.
+- **Cohortes de retention** : suivi du taux de clients encore actifs mois apres mois, selon leur mois d'arrivee, ainsi que la meilleure cohorte a trois mois.
+- **Fraude par marchand** : marchands totalisant le plus de transactions suspectes, avec le montant associe.
+
+### Optimisations Spark
+
+Le fichier `SparkOptimizations.scala` regroupe des optimisations activables par la configuration :
+
+- **Broadcast join** sur la table des marchands (petite table de reference), pour eviter un shuffle couteux.
+- **Cache et persist** des donnees reutilisees (persist en memoire et sur disque).
+- **Nombre de partitions de shuffle** configurable.
+
+Ces reglages sont pilotes par la configuration, ce qui permet de les activer ou de les desactiver pour comparer les performances.
+
+### Orchestration
+
+Le fichier `MainApp.scala` est le point d'entree qui enchaine tout le pipeline : ingestion, validation, rapport de qualite, transformation, puis analyses. Il utilise les donnees validees pour ne pas polluer les analyses, et gere les cas particuliers rencontres a l'assemblage (valeurs nulles, timestamps corrompus).
+
+### Fichiers de sortie
+
+En plus des rapports de qualite (`quality_summary` et `quality_detail`), le pipeline complet produit dans le dossier `output/` :
+
+- `merchant_report` : les KPI par marchand
+- `merchant_age_distribution` : la repartition par tranche d'age
+- `cohort_retention` : la matrice de cohortes de retention
+- `fraud_by_merchant` : les transactions suspectes par marchand

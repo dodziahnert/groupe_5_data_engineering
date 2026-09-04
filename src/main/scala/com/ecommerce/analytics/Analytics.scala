@@ -8,11 +8,11 @@ object Analytics {
 
   def merchantReport(enriched: DataFrame): DataFrame = {
     val agg = enriched.groupBy("merchant_id").agg(
-      first("merchant_name").as("merchant_name"),
-      first("merchant_category").as("category"),
-      first("merchant_region").as("region"),
-      first("commission_rate").as("commission_rate"),
-      sum("amount").as("total_revenue"),
+      first("merchant_name", ignoreNulls = true).as("merchant_name"),
+      first("merchant_category", ignoreNulls = true).as("category"),
+      first("merchant_region", ignoreNulls = true).as("region"),
+      first("commission_rate", ignoreNulls = true).as("commission_rate"),
+      round(sum("amount"), 2).as("total_revenue"),
       count("transaction_id").as("nb_transactions"),
       countDistinct("user_id").as("nb_unique_customers"),
       round(avg("amount"), 2).as("avg_transaction_amount"),
@@ -31,14 +31,15 @@ object Analytics {
     enriched
       .groupBy("merchant_id", "age_group")
       .agg(
-        sum("amount").as("revenue_for_bracket"),
+        round(sum("amount"), 2).as("revenue_for_bracket"),
         count("transaction_id").as("nb_transactions_for_bracket")
       )
 
   private def withCohortMonth(df: DataFrame): DataFrame = {
+    val clean = df.filter(col("transaction_time").isNotNull)
     val w = Window.partitionBy("user_id")
-    df.withColumn("cohort_month", date_format(min("transaction_time").over(w), "yyyy-MM"))
-      .withColumn("tx_month", date_format(col("transaction_time"), "yyyy-MM"))
+    clean.withColumn("cohort_month", date_format(min("transaction_time").over(w), "yyyy-MM"))
+         .withColumn("tx_month", date_format(col("transaction_time"), "yyyy-MM"))
   }
 
   def cohortRetentionMatrix(enriched: DataFrame): DataFrame = {
@@ -75,9 +76,9 @@ object Analytics {
       .filter(col("is_suspicious") === 1)
       .groupBy("merchant_id")
       .agg(
-        first("merchant_name").as("merchant_name"),
+        first("merchant_name", ignoreNulls = true).as("merchant_name"),
         count("transaction_id").as("nb_transactions_suspectes"),
-        sum("amount").as("montant_total_suspect")
+        round(sum("amount"), 2).as("montant_total_suspect")
       )
       .orderBy(col("nb_transactions_suspectes").desc)
 }

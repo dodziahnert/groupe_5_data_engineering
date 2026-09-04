@@ -9,3 +9,4 @@ project/project/
 .vscode/
 .bsp/
 output/
+.DS_Store
